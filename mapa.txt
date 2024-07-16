@@ -1,0 +1,4 @@
+Formulário (área pública)
+Gestão de questões (área restrita)
+Autenticação
+Envio de Email

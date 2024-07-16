@@ -1,0 +1,34 @@
+Área restrita
+    Autenticação
+        POST    - /api/login
+        POST    - /api/logout
+    
+    Usuários
+        POST    - /api/usuario                  (Cadastrar)
+        PUT     - /api/usuario/:id              (Editar)
+        DELETE  - /api/usuario/:id              (Deletar)
+        GET     - /api/usuario                  (Listar todos)
+        GET     - /api/usuario/:id              (Pesquisar)
+        GET     - /api/usuario/:id/email-pontuacao    (Enviar pontuação do usuário por email)
+
+    Perguntas
+        POST    - /api/pergunta                 (Cadastrar)
+        PUT     - /api/pergunta/:id             (Editar)
+        DELETE  - /api/pergunta/:id             (Deletar)
+        GET     - /api/pergunta                 (Listar todos)
+        GET     - /api/pergunta/:id             (Pesquisar)
+        
+    Alternativas
+        POST    - /api/alternativa              (Cadastrar)
+        PUT     - /api/alternativa/:id          (Editar)
+        DELETE  - /api/alternativa/:id          (Deletar)
+        GET     - /api/alternativa              (Listar todos)
+        GET     - /api/alternativa/:id          (Pesquisar)
+
+    Testes
+        GET     - /api/teste/usuario/pontuacao?search=  (Lista usuários e suas pontuações)
+
+Área pública
+    POST    - /api/teste/iniciar
+    GET     - /api/teste/pergunta
+    POST    - /api/teste/finalizar
