@@ -15,72 +15,124 @@ class DataBase{
         }).promise()
     }
 
-    async getDataUsuarios() {
-        try {
-            const [dados] = await this.conexoes.query("SELECT * FROM usuarios")
-            return dados
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    
-    async getIndividualDataUsuarios(id){
-        try {
-            const [dados] = await this.conexoes.query("SELECT * FROM usuarios WHERE id = ?", [id])
-            return dados
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async getPerguntas(todas){
-        if (todas){
+    async getDataUsuarios(id_usuario = false) {
+        if (id_usuario){
             try {
-                let [dados] = await this.conexoes.query("SELECT * FROM perguntas")
+                const [dados] = await this.conexoes.query("SELECT * FROM usuarios WHERE id = ?", [id_usuario])
                 return dados
             } catch (error) {
                 console.log(error)
             }
         }else{
             try {
-                let [dados] = await this.conexoes.query("SELECT * FROM perguntas WHERE ativo = ?", [true])
+                const [dados] = await this.conexoes.query("SELECT * FROM usuarios")
                 return dados
             } catch (error) {
-                console.log(error);
+                console.log(error)
             }
         }
     }
 
-    async getQuestionarios(){
-        try {
-            let [dados] = await this.conexoes.query("SELECT * FROM questionarios")
-            return dados
-        } catch (error) {
-            console.log(error)
+    async getPerguntas(todas = false){
+        if (todas){
+            try {
+                let [dados] = await this.conexoes.query("SELECT * FROM perguntas ORDER BY ordem ASC")
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
+        }else{
+            try {
+                let [dados] = await this.conexoes.query("SELECT * FROM perguntas WHERE ativo = ? ORDER BY ordem ASC", [true])
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
+
+    async getAlternativas(id_questao = false){
+        if (id_questao){
+            try {
+                let [dados] = await this.conexoes.query(
+                    `SELECT * FROM alternativas WHERE id_pergunta = ? AND ativo = ? ORDER by ordem ASC`,
+                    [id_questao, true]
+                )
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
+        }else{
+            try {
+                let [dados] = await this.conexoes.query("SELECT * FROM alternativas ORDER BY ordem ASC")
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
+
+    async getQuestionarios(id_questionario = false){
+        if (id_questionario) {
+            try {
+                let [dados] = await this.conexoes.query("SELECT * FROM questionarios WHERE id = ?", [id_questionario])
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            try {
+                let [dados] = await this.conexoes.query("SELECT * FROM questionarios")
+                return dados
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
     
-    async postDataUsuarios(nome, email, senha){
+    async postDataUsuarios(nome, email, senha = false){
         if (senha){
             try {
                 const [dados] = await this.conexoes.query("INSERT INTO usuarios (nome, email, senha, admin, ativo) VALUES (?, ?, ?, ?, ?)", [nome, email, senha, true, true])
-                return this.getIndividualDataUsuarios(dados.insertId)
+                return this.getDataUsuarios(dados.insertId)
             } catch (error) {
-                console.log(error);
+                console.log(error)
             }
         }else{
             try {
                 const [dados] = await this.conexoes.query("INSERT INTO usuarios (nome, email, senha, admin, ativo) VALUES (?, ?, ?, ?, ?)", [nome, email, null, false, false])
-                return this.getIndividualDataUsuarios(dados.insertId)
+                return this.getDataUsuarios(dados.insertId)
             } catch (error) {
-                console.log(error);
+                console.log(error)
             }
         }
     }
 
-    async updateDataUsuarios(id, nome, email, senha, admin, ativo){
+    async postQuestionario(id_usuario, data){
         try {
-            await this.conexoes.query(`UPDATE usuarios
+            const [dados] = await this.conexoes.query("INSERT INTO questionarios (id_usuario, total_pontos, data) values (?, ?, ?)", [id_usuario, 0, data])
+            return this.getQuestionarios(dados.insertId)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async patchQuestionario(id, pontos){
+        try {
+            const resultado = await this.conexoes.query(
+                `UPDATE questionarios
+                SET total_pontos = ?
+                WHERE id = ?`, [pontos, id]
+            )
+            return resultado
+        } catch (error) {
+            return false
+        }
+    }
+
+    async putDataUsuarios(id, nome, email, senha, admin, ativo){
+        try {
+            let resultado = await this.conexoes.query(`UPDATE usuarios
             SET nome = ?, email = ?, senha = ?, admin = ?, ativo = ?
             WHERE id = ?`, [
                 nome,
@@ -90,16 +142,18 @@ class DataBase{
                 ativo,
                 id
             ])
+            return resultado
         } catch (error) {
-            console.log(error)
+            return false
         }
     }
 
     async deleteDataUsuarios(id){
         try {
-            await this.conexoes.query("DELETE FROM usuarios WHERE id = ?", [id])
+            let resultado = await this.conexoes.query("DELETE FROM usuarios WHERE id = ?", [id])
+            return resultado
         } catch (error) {
-            console.log(error)
+            return false
         }
     }
 
